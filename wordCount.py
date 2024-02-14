@@ -6,12 +6,11 @@ def count(input_file, output_file):
     inputF = os.open(input_file, os.O_RDWR)
     size = os.stat(inputF).st_size
     read = os.read(inputF, size)
-
-    outputF = os.open(output_file, os.O_RDWR)
-
+    os.close(inputF)
+    
     #Turn file from bytes to words
     text = read.decode('utf-8')
-
+    
     #Reads all words in the file
     words = re.findall(r'\b\w+\b', text.lower())
 
@@ -32,23 +31,23 @@ def count(input_file, output_file):
     sorted_dic = {key: word_dic[key] for key in sorted(word_dic.keys())}
 
     #Write the dictionary in the output file
-    outputF = os.open(output_file, os.O_RDWR)
+    outputF = os.open(output_file, os.O_RDWR | os.O_CREAT)
     for key, value in sorted_dic.items():
         byte_type = (f"{key} {value}\n").encode('utf-8')
         os.write(outputF, byte_type)
 
-        os.close(outputF)
+
+    os.close(outputF)
                                       
+def check_char(i):
     punctuation = {",", ".", ":", ";"}
-
-    def check_char(i):
-        if i in punctuation:
-            return True
-        else:
-            return False
+    if i in punctuation:
+        return True
+    else:
+        return False
 
 
-    inputTo = sys.argv[1]
-    outputTo = sys.argv[2]
+inputTo = sys.argv[1]
+outputTo = sys.argv[2]
 
-    wordCount(inputTo, outputTo)
+count(inputTo, outputTo)
