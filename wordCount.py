@@ -1,53 +1,27 @@
+#! /usr/bin/env python3
+
 import re
 import sys
-import os
 
 def count(input_file, output_file):
-    inputF = os.open(input_file, os.O_RDWR)
-    size = os.stat(inputF).st_size
-    read = os.read(inputF, size)
-    os.close(inputF)
-    
-    #Turn file from bytes to words
-    text = read.decode('utf-8')
-    
-    #Reads all words in the file
-    words = re.findall(r'\b\w+\b', text.lower())
+    #Reads file
+    with open(input_file, 'r') as file:
+        text = file.read().lower()
 
-    #Count number of types each word appears
-    word_dic = {}
+    #Finds all the words in the file
+    words = re.findall(r'\b\w+\b', text)
 
-    current_word = ''
-    for string in text:
-        if not check_char(string) and (string.isspace() or string == '-' or string == "'"):
-            if current_word:
-                current_word = current_word.strip()
-                word_dic[current_word] = word_dic.get(current_word, 0) + 1
-                current_word = ''
-            else:
-                current_word += string.lower()
+    #Count occurrances
+    word_count = {}
+    for word in words:
+        word_count[word] = word_count.get(word, 0) + 1
 
-    #Sort the dictionary
-    sorted_dic = {key: word_dic[key] for key in sorted(word_dic.keys())}
+    #Sort to alphabetical order
+    sorted_word_count = sorted(word_count.items())
 
-    #Write the dictionary in the output file
-    outputF = os.open(output_file, os.O_RDWR | os.O_CREAT)
-    for key, value in sorted_dic.items():
-        byte_type = (f"{key} {value}\n").encode('utf-8')
-        os.write(outputF, byte_type)
+    #Write output file
+    with open(output_file, 'w') as file:
+        for word, count in sorted_word_count:
+            file.write(f"{word} {count}\n")
 
-
-    os.close(outputF)
-                                      
-def check_char(i):
-    punctuation = {",", ".", ":", ";"}
-    if i in punctuation:
-        return True
-    else:
-        return False
-
-
-inputTo = sys.argv[1]
-outputTo = sys.argv[2]
-
-count(inputTo, outputTo)
+        
