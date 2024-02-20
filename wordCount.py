@@ -24,4 +24,7 @@ def count(input_file, output_file):
         for word, count in sorted_word_count:
             file.write(f"{word} {count}\n")
 
-        
+input_file = sys.argv[1]
+output_file = sys.argv[2]
+
+count(input_file, output_file)
